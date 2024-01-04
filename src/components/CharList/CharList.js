@@ -1,6 +1,5 @@
 import './charList.scss';
-import abyss from '../../resources/img/abyss.jpg';
-import { Component } from 'react';
+import React, { Component } from 'react';
 import MarvelService from '../../services/MarvelService';
 import Spinner from '../Spinner/Spinner';
 import Error from '../Error/Error';
@@ -12,10 +11,32 @@ class CharList extends Component{
         offset: 210, // отстут
         loading: true, // загрузка
         error: false, // ошибка
-        charEnded: false // флаг конца пагинации
+        charEnded: false, // флаг конца пагинации
+        selectedCard: null
     }
 
     service = new MarvelService();
+    cardRefs = []; // массив ссылок на карточки персонажей
+    
+    setRef = (element, index) => { //callback ref на каждую карточку
+        this.cardRefs[index] = element;
+    }
+
+    handleCardClick = (cardIndex) => {
+        const {selectedCard} = this.state;
+
+        if(cardIndex !== selectedCard && selectedCard !== null) { // если произошел клик на другую карточку с текущей убирается выделение
+            this.cardRefs[selectedCard].classList.remove('char__item_selected');
+        }
+
+        this.setState({selectedCard: cardIndex});
+        this.cardRefs[cardIndex].classList.add('char__item_selected');
+    }
+
+    onSelected = (id, cardIndex) => {
+        this.props.onCharSelected(id);
+        this.handleCardClick(cardIndex);
+    }
 
     setLoading = () => {
         this.setState({loading: true});
@@ -42,7 +63,8 @@ class CharList extends Component{
 
     loadList = (offset) => {
         this.setLoading();
-        this.service.getAllCharacters(offset)
+        this.service
+        .getAllCharacters(offset)
         .then(this.onListLoaded)
         .catch(this.onError);
     }
@@ -67,11 +89,12 @@ class CharList extends Component{
         return (
             <div className="char__list">
                     <ul className="char__grid">
-                            {charList.map(({name, thumbnail, id}) => 
+                            {charList.map(({name, thumbnail, id}, index) => 
                             (                    
                             <li className="char__item"
+                            ref={(el) => this.setRef(el, index)}
                             key={id}
-                            onClick={() => this.props.onCharSelected(id)}>
+                            onClick={() => this.onSelected(id, index)}>
                                 <img src={thumbnail} alt="abyss"/>
                                 <div className="char__name">{name}</div>
                             </li>
@@ -83,7 +106,7 @@ class CharList extends Component{
                 <button className="button button__main button__long"
                 disabled={loading}
                 style={{display: charEnded ? 'none' : 'block'}}
-                onClick={() => this.loadList(offset)}>
+                onClick={() => {this.loadList(offset)}}>
                     <div className="inner">load more</div>
                 </button>
             </div>
