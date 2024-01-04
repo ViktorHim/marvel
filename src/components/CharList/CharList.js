@@ -4,8 +4,7 @@ import MarvelService from '../../services/MarvelService';
 import Spinner from '../Spinner/Spinner';
 import Error from '../Error/Error';
 
-const CharList = ({onCharSelected}) => {
-
+const CharList = ({handleCharSelected}) => {
     const [charList, setCharList] = useState([]); // список персонажей
     const [offset, setOffset] = useState(210); // отступ
     const [loading, setLoading] = useState(true); // загрузка
@@ -14,7 +13,7 @@ const CharList = ({onCharSelected}) => {
     const [selectedCard, SetSelectedCard] = useState(null); // индекс выбранной карточки
 
     useEffect(() => {
-        loadList();
+        loadCharList();
     }, []);
 
     const cardRefs = useRef([]); // массив ссылок на карточки персонажей
@@ -34,12 +33,12 @@ const CharList = ({onCharSelected}) => {
         cardRefs[cardIndex].classList.add('char__item_selected');
     }
 
-    const onCardSelected = (id, cardIndex) => {
-        onCharSelected(id);
+    const handleCardSelected = (id, cardIndex) => {
+        handleCharSelected(id);
         handleCardClick(cardIndex);
     }
 
-    const onListLoaded = (list) => {
+    const handleCharListLoaded = (list) => {
         let ended = false;
 
         if(list.length < 9) {
@@ -52,20 +51,20 @@ const CharList = ({onCharSelected}) => {
         setCharEnded(ended);
     }
 
-    const onError = () => {
+    const handleError = () => {
         setLoading(false);
         setError(true);
     }
 
-    const loadList = (offset) => {
+    const loadCharList = (offset) => {
         const service = new MarvelService();
 
         setLoading(true);
 
         service
         .getAllCharacters(offset)
-        .then(onListLoaded)
-        .catch(onError);
+        .then(handleCharListLoaded)
+        .catch(handleError);
     }
 
     const renderCharItems = () => {
@@ -74,7 +73,7 @@ const CharList = ({onCharSelected}) => {
             <li className="char__item"
             ref={(el) => cardRefs[index] = el}
             key={id}
-            onClick={() => onCardSelected(id, index)}>
+            onClick={() => handleCardSelected(id, index)}>
                 <img src={thumbnail} alt="abyss"/>
                 <div className="char__name">{name}</div>
             </li>
@@ -91,7 +90,7 @@ const CharList = ({onCharSelected}) => {
                 <button className="button button__main button__long"
                 disabled={loading}
                 style={{display: charEnded ? 'none' : 'block'}}
-                onClick={() => loadList(offset)}>
+                onClick={() => loadCharList(offset)}>
                     <div className="inner">load more</div>
                 </button>
             </div>

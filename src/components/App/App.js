@@ -9,7 +9,7 @@ import decoration from '../../resources/img/vision.png';
 const App = () => {
     const [selectedChar, SetSelectedChar] = useState(null);
 
-    const onCharSelected = (id) => {
+    const handleCharSelected = (id) => {
         SetSelectedChar(id);
     }
 
@@ -19,7 +19,7 @@ const App = () => {
             <main>
                 <RandomChar/>
                 <div className="char__content">
-                    <CharList onCharSelected={onCharSelected}/>
+                    <CharList handleCharSelected={handleCharSelected}/>
                     <CharInfo charId={selectedChar}/>
                 </div>
                 <img className="bg-decoration" src={decoration} alt="vision"/>

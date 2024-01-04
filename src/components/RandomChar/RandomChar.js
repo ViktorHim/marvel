@@ -20,12 +20,12 @@ const RandomChar = () => {
         return <View char={character}/>;
     }, [loading, error, character]);
 
-    const onCharLoaded = (char) => {
+    const handleCharLoaded = (char) => {
         setLoading(false);
         setCharacter(char);
     }
 
-    const onError = () => {
+    const handleError = () => {
         setLoading(false);
         setError(true);
     }
@@ -41,8 +41,8 @@ const RandomChar = () => {
         const id = getRandomId();
 
         service.getCharacterById(id)
-        .then(onCharLoaded)
-        .catch(onError);
+        .then(handleCharLoaded)
+        .catch(handleError);
     }
 
         return (

@@ -10,16 +10,6 @@ const CharInfo = ({charId}) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
 
-    const onCharLoaded = (char) => {
-        setCharacter(char);
-        setLoading(false);
-    }
-
-    const onError = () => {
-        setError(true);
-        setLoading(false);
-    }
-
     useEffect(() => {
         const updateChar = () => {
             if(!charId) {
@@ -32,12 +22,22 @@ const CharInfo = ({charId}) => {
 
             service
             .getCharacterById(charId)
-            .then(onCharLoaded)
-            .catch(onError);
+            .then(handleCharLoaded)
+            .catch(handleError);
         }
 
         updateChar();
     }, [charId]);
+
+    const handleCharLoaded = (char) => {
+        setCharacter(char);
+        setLoading(false);
+    }
+
+    const handleError = () => {
+        setError(true);
+        setLoading(false);
+    }
 
     let content = null;
     if(!loading && !error && !character) {
