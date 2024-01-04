@@ -1,118 +1,101 @@
 import './charList.scss';
-import React, { Component } from 'react';
+import React, { useState, useRef, useEffect, useMemo} from 'react';
 import MarvelService from '../../services/MarvelService';
 import Spinner from '../Spinner/Spinner';
 import Error from '../Error/Error';
 
-class CharList extends Component{
+const CharList = ({onCharSelected}) => {
 
-    state = {
-        charList: [], // список персонажей
-        offset: 210, // отстут
-        loading: true, // загрузка
-        error: false, // ошибка
-        charEnded: false, // флаг конца пагинации
-        selectedCard: null
-    }
+    const [charList, setCharList] = useState([]); // список персонажей
+    const [offset, setOffset] = useState(210); // отступ
+    const [loading, setLoading] = useState(true); // загрузка
+    const [error, setError] = useState(false); // ошибка
+    const [charEnded, setCharEnded] = useState(false); // флаг конца пагинации
+    const [selectedCard, SetSelectedCard] = useState(null); // индекс выбранной карточки
 
-    service = new MarvelService();
-    cardRefs = []; // массив ссылок на карточки персонажей
-    
-    setRef = (element, index) => { //callback ref на каждую карточку
-        this.cardRefs[index] = element;
-    }
+    useEffect(() => {
+        loadList();
+    }, []);
 
-    handleCardClick = (cardIndex) => {
-        const {selectedCard} = this.state;
+    const cardRefs = useRef([]); // массив ссылок на карточки персонажей
 
+    const otherContent = useMemo(() => { // определение дополниельного контента (спиннер, ошибка)
+        if(loading) return <Spinner/>;
+        if(error) return <Error/>;
+        return null;
+    }, [loading, error]);
+
+    const handleCardClick = (cardIndex) => {
         if(cardIndex !== selectedCard && selectedCard !== null) { // если произошел клик на другую карточку с текущей убирается выделение
-            this.cardRefs[selectedCard].classList.remove('char__item_selected');
+            cardRefs[selectedCard].classList.remove('char__item_selected');
         }
 
-        this.setState({selectedCard: cardIndex});
-        this.cardRefs[cardIndex].classList.add('char__item_selected');
+        SetSelectedCard(cardIndex);
+        cardRefs[cardIndex].classList.add('char__item_selected');
     }
 
-    onSelected = (id, cardIndex) => {
-        this.props.onCharSelected(id);
-        this.handleCardClick(cardIndex);
+    const onCardSelected = (id, cardIndex) => {
+        onCharSelected(id);
+        handleCardClick(cardIndex);
     }
 
-    setLoading = () => {
-        this.setState({loading: true});
-    }
-
-    onListLoaded = (list) => {
+    const onListLoaded = (list) => {
         let ended = false;
 
         if(list.length < 9) {
             ended = true;
         }
 
-        this.setState(({charList, offset}) => ({
-            charList: [...charList, ...list],
-            loading: false,
-            offset: offset + 9,
-            charEnded: ended
-        }));
+        setCharList((prev) => ([...prev, ...list]));
+        setOffset((prev) => (prev + 9));
+        setLoading(false);
+        setCharEnded(ended);
     }
 
-    onError = () => {
-        this.setState({loading: false, error: true});
+    const onError = () => {
+        setLoading(false);
+        setError(true);
     }
 
-    loadList = (offset) => {
-        this.setLoading();
-        this.service
+    const loadList = (offset) => {
+        const service = new MarvelService();
+
+        setLoading(true);
+
+        service
         .getAllCharacters(offset)
-        .then(this.onListLoaded)
-        .catch(this.onError);
+        .then(onListLoaded)
+        .catch(onError);
     }
 
-    componentDidMount () {
-        this.loadList();
+    const renderCharItems = () => {
+        return charList.map(({name, thumbnail, id}, index) => 
+        (                    
+            <li className="char__item"
+            ref={(el) => cardRefs[index] = el}
+            key={id}
+            onClick={() => onCardSelected(id, index)}>
+                <img src={thumbnail} alt="abyss"/>
+                <div className="char__name">{name}</div>
+            </li>
+        )
+    );
     }
 
-    render() {
-        const {charList, loading,error, offset, charEnded} = this.state;
-        let content = null;
-
-        if(loading) {
-            content = <Spinner/>;
-        } else if (error) {
-            content = <Error/>;
-        }
-        else {
-            content = null;
-        }
+    const charItems = renderCharItems();
 
         return (
             <div className="char__list">
-                    <ul className="char__grid">
-                            {charList.map(({name, thumbnail, id}, index) => 
-                            (                    
-                            <li className="char__item"
-                            ref={(el) => this.setRef(el, index)}
-                            key={id}
-                            onClick={() => this.onSelected(id, index)}>
-                                <img src={thumbnail} alt="abyss"/>
-                                <div className="char__name">{name}</div>
-                            </li>
-                        )
-                        )}
-                        </ul>
-                        {content}
-                
+                <ul className="char__grid">{charItems}</ul>
+                {otherContent}
                 <button className="button button__main button__long"
                 disabled={loading}
                 style={{display: charEnded ? 'none' : 'block'}}
-                onClick={() => {this.loadList(offset)}}>
+                onClick={() => loadList(offset)}>
                     <div className="inner">load more</div>
                 </button>
             </div>
         )
-    }
-   
 }
 
 export default CharList;
