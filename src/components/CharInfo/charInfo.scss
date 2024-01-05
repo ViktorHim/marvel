@@ -47,6 +47,9 @@
             position: relative;
             margin-top: 10px;
         }
+        &-link:hover {
+            color: red;
+        }
         &-item {
             width: 100%;
             padding: 0px 10px;

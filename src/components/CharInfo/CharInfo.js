@@ -1,5 +1,6 @@
 import './charInfo.scss';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../Spinner/Spinner';
 import Error from '../Error/Error';
@@ -74,13 +75,16 @@ const View = ({char}) =>{
                 <ul className="char__comics-list">
                     {comics.length > 0 ? null : 'no comics'}
                     {
-                        comics.slice(0, 10).map((item,i) => 
-                        (                    
+                        comics.slice(0, 10).map((item,i) => {
+
+                        const match = item.resourceURI.match(/\/(\d+)$/);
+                        const comicId = match ? match[1] : 'not-found';
+                        return (                    
                         <li className="char__comics-item"
                         key={i}>
-                            {item.name}
+                            <Link to={`comics/${comicId}`} className='char__comics-link'>{item.name}</Link>
                         </li>
-                    ))
+                    )})
                     }
                 </ul>
         </>
