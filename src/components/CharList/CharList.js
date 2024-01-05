@@ -1,16 +1,16 @@
 import './charList.scss';
 import React, { useState, useRef, useEffect, useMemo} from 'react';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 import Spinner from '../Spinner/Spinner';
 import Error from '../Error/Error';
 
 const CharList = ({handleCharSelected}) => {
     const [charList, setCharList] = useState([]); // список персонажей
     const [offset, setOffset] = useState(210); // отступ
-    const [loading, setLoading] = useState(true); // загрузка
-    const [error, setError] = useState(false); // ошибка
     const [charEnded, setCharEnded] = useState(false); // флаг конца пагинации
     const [selectedCard, SetSelectedCard] = useState(null); // индекс выбранной карточки
+
+    const {loading, error, getAllCharacters} = useMarvelService();
 
     useEffect(() => {
         loadCharList();
@@ -47,24 +47,12 @@ const CharList = ({handleCharSelected}) => {
 
         setCharList((prev) => ([...prev, ...list]));
         setOffset((prev) => (prev + 9));
-        setLoading(false);
         setCharEnded(ended);
     }
 
-    const handleError = () => {
-        setLoading(false);
-        setError(true);
-    }
-
     const loadCharList = (offset) => {
-        const service = new MarvelService();
-
-        setLoading(true);
-
-        service
-        .getAllCharacters(offset)
+        getAllCharacters(offset)
         .then(handleCharListLoaded)
-        .catch(handleError);
     }
 
     const renderCharItems = () => {
