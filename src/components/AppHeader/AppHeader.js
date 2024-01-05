@@ -1,7 +1,12 @@
 import './appHeader.scss';
-import { Link } from 'react-router-dom';
+import { Link, NavLink} from 'react-router-dom';
 
 const AppHeader = () => {
+
+    const handleActiveLink = ({isActive}) => {
+        return isActive ? {color : 'red'} : null;
+    }
+
     return (
         <header className="app__header">
             <h1 className="app__title">
@@ -11,9 +16,9 @@ const AppHeader = () => {
             </h1>
             <nav className="app__menu">
                 <ul>
-                    <li><Link to="/">Characters</Link></li>
+                    <li><NavLink style={handleActiveLink} to="/">Characters</NavLink></li>
                     /
-                    <li><Link to="/comics">Comics</Link></li>
+                    <li><NavLink style={handleActiveLink} to="/comics">Comics</NavLink></li>
                 </ul>
             </nav>
         </header>
