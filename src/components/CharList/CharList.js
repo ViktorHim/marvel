@@ -50,7 +50,7 @@ const CharList = ({handleCharSelected}) => {
         setCharEnded(ended);
     }
 
-    const loadCharList = (offset) => {
+    const loadCharList = () => {
         getAllCharacters(offset)
         .then(handleCharListLoaded)
     }
@@ -78,7 +78,7 @@ const CharList = ({handleCharSelected}) => {
                 <button className="button button__main button__long"
                 disabled={loading}
                 style={{display: charEnded ? 'none' : 'block'}}
-                onClick={() => loadCharList(offset)}>
+                onClick={loadCharList}>
                     <div className="inner">load more</div>
                 </button>
             </div>
