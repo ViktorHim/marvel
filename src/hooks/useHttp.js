@@ -17,7 +17,7 @@ const useHttp = () => {
             setLoading(false);
             return data;
         } catch (err) {
-            handleError(error);
+            handleError(err);
             throw err;
         }
     }, []);

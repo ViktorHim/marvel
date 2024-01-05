@@ -16,7 +16,7 @@ const AppHeader = () => {
             </h1>
             <nav className="app__menu">
                 <ul>
-                    <li><NavLink style={handleActiveLink} to="/">Characters</NavLink></li>
+                    <li><NavLink end style={handleActiveLink} to="/">Characters</NavLink></li>
                     /
                     <li><NavLink style={handleActiveLink} to="/comics">Comics</NavLink></li>
                 </ul>
